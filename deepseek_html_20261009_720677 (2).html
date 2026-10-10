@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>CITY OF DECAY: REBORN — RUSH ⚡</title>
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; }
+  * { margin: 0; padding: 0; box-sizing: border-box; user-select: none; -webkit-tap-highlight-color: transparent; }
   html, body {
     width: 100%; height: 100%; overflow: hidden;
     background: #000; font-family: 'Arial Black', sans-serif;
@@ -25,22 +25,130 @@
   #mobile-controls {
     position: absolute; inset: 0; pointer-events: none; display: none;
   }
-  .btn {
-    position: absolute; pointer-events: auto;
-    width: 72px; height: 72px; border-radius: 50%;
-    background: rgba(255,100,0,0.25);
-    border: 3px solid rgba(255,180,80,0.7);
-    color: #fff; font-size: 30px; font-weight: bold;
-    display: flex; align-items: center; justify-content: center;
-    backdrop-filter: blur(4px);
+  
+  /* ===== JOYSTICK ===== */
+  #joystick-zone {
+    position: absolute;
+    left: 20px;
+    bottom: 30px;
+    width: 180px;
+    height: 180px;
+    pointer-events: auto;
     touch-action: none;
-    box-shadow: 0 0 15px rgba(255,100,0,0.5);
   }
-  .btn:active { background: rgba(255,100,0,0.7); transform: scale(0.95); }
-  #btn-left  { left: 20px;  bottom: 30px; }
-  #btn-right { left: 110px; bottom: 30px; }
-  #btn-jump  { right: 20px; bottom: 100px; background: rgba(0,200,255,0.25); border-color: rgba(100,220,255,0.7); }
-  #btn-attack{ right: 110px; bottom: 30px; background: rgba(255,50,100,0.3); border-color: rgba(255,150,180,0.7); }
+  #joystick-base {
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: radial-gradient(circle at 50% 50%, rgba(255,140,0,0.20), rgba(255,80,0,0.10));
+    border: 4px solid rgba(255,180,80,0.65);
+    box-shadow: 0 0 30px rgba(255,100,0,0.5), inset 0 0 30px rgba(255,100,0,0.2);
+    backdrop-filter: blur(4px);
+  }
+  #joystick-base::before {
+    content: '';
+    position: absolute;
+    inset: 22%;
+    border-radius: 50%;
+    border: 2px dashed rgba(255,200,120,0.4);
+  }
+  #joystick-knob {
+    position: absolute;
+    left: 50%; top: 50%;
+    width: 84px; height: 84px;
+    margin-left: -42px; margin-top: -42px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 30%, #ffb070, #ff6b1a 60%, #b33a00);
+    border: 4px solid rgba(255,220,160,0.9);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.6), inset 0 -6px 12px rgba(0,0,0,0.3), 0 0 24px rgba(255,120,0,0.7);
+    transition: transform 0.05s linear;
+    will-change: transform;
+  }
+  #joystick-knob::after {
+    content: '';
+    position: absolute;
+    inset: 28%;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.35);
+  }
+
+  /* ===== BOTONES DE ACCIÓN ===== */
+  .action-btn {
+    position: absolute;
+    pointer-events: auto;
+    border-radius: 50%;
+    color: #fff;
+    font-size: 40px;
+    font-weight: bold;
+    display: flex; align-items: center; justify-content: center;
+    backdrop-filter: blur(5px);
+    touch-action: none;
+    transition: transform 0.08s ease, background 0.08s ease;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+  }
+  .action-btn:active, .action-btn.pressed {
+    transform: scale(0.9);
+  }
+  .action-btn .label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 12px;
+    letter-spacing: 1px;
+    color: rgba(255,230,200,0.9);
+    text-shadow: 0 0 6px #000, 0 0 10px #ff6b3d;
+    white-space: nowrap;
+  }
+
+  /* Salto */
+  #btn-jump {
+    right: 30px;
+    bottom: 210px;
+    width: 110px; height: 110px;
+    font-size: 48px;
+    background: radial-gradient(circle at 35% 30%, rgba(120,230,255,0.85), rgba(0,150,220,0.7));
+    border: 5px solid rgba(150,230,255,0.95);
+    box-shadow: 0 0 28px rgba(0,200,255,0.75), inset 0 -6px 14px rgba(0,0,0,0.3);
+    color: #eafaff;
+  }
+  #btn-jump:active, #btn-jump.pressed {
+    background: radial-gradient(circle at 35% 30%, #aef0ff, #00a0e0);
+    box-shadow: 0 0 45px rgba(0,220,255,1);
+  }
+
+  /* Atacar */
+  #btn-attack {
+    right: 160px;
+    bottom: 60px;
+    width: 110px; height: 110px;
+    font-size: 48px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,120,160,0.9), rgba(220,20,80,0.75));
+    border: 5px solid rgba(255,170,200,0.95);
+    box-shadow: 0 0 28px rgba(255,60,120,0.75), inset 0 -6px 14px rgba(0,0,0,0.3);
+    color: #fff0f5;
+  }
+  #btn-attack:active, #btn-attack.pressed {
+    background: radial-gradient(circle at 35% 30%, #ffc0d8, #e01860);
+    box-shadow: 0 0 45px rgba(255,80,140,1);
+  }
+
+  /* Correr */
+  #btn-run {
+    right: 30px;
+    bottom: 60px;
+    width: 110px; height: 110px;
+    font-size: 46px;
+    background: radial-gradient(circle at 35% 30%, rgba(255,220,120,0.9), rgba(220,140,0,0.75));
+    border: 5px solid rgba(255,230,150,0.95);
+    box-shadow: 0 0 28px rgba(255,180,40,0.75), inset 0 -6px 14px rgba(0,0,0,0.3);
+    color: #fffaf0;
+  }
+  #btn-run:active, #btn-run.pressed {
+    background: radial-gradient(circle at 35% 30%, #fff0a0, #e09000);
+    box-shadow: 0 0 45px rgba(255,210,60,1);
+  }
+
   #hint {
     position: absolute; top: 10px; left: 50%; transform: translateX(-50%);
     color: #fff; font-size: 12px; opacity: 0.6; text-align: center;
@@ -53,10 +161,18 @@
   <canvas id="canvas" width="960" height="540"></canvas>
   <div id="hint">PC: ← → / A D mover · ESPACIO saltar · J / CLICK atacar · I inventario · P pausa · M móvil</div>
   <div id="mobile-controls">
-    <div class="btn" id="btn-left">◀</div>
-    <div class="btn" id="btn-right">▶</div>
-    <div class="btn" id="btn-jump">⤒</div>
-    <div class="btn" id="btn-attack">⚔</div>
+
+    <!-- JOYSTICK -->
+    <div id="joystick-zone">
+      <div id="joystick-base"></div>
+      <div id="joystick-knob"></div>
+    </div>
+
+    <!-- BOTONES DE ACCIÓN -->
+    <div class="action-btn" id="btn-jump">⤒<span class="label">SALTAR</span></div>
+    <div class="action-btn" id="btn-attack">⚔<span class="label">ATACAR</span></div>
+    <div class="action-btn" id="btn-run">🏃<span class="label">CORRER</span></div>
+
   </div>
 </div>
 
@@ -77,7 +193,8 @@ const controls = {
   jump: ['Space','ArrowUp','KeyW'],
   attack: ['KeyJ','KeyX'],
   pause: ['KeyP','Escape'],
-  inventory: ['KeyI','Tab']
+  inventory: ['KeyI','Tab'],
+  run: ['ShiftLeft','ShiftRight']
 };
 try {
   const saved = localStorage.getItem('cod_reborn_controls');
@@ -88,7 +205,7 @@ function saveControls(){
 }
 
 const keys = {};
-const touch = { left:false, right:false, jump:false, attack:false };
+const touch = { left:false, right:false, jump:false, attack:false, run:false, joyX:0 };
 // NUEVO: flag para click de ratón como ataque
 let mouseAttackPressed = false;
 
@@ -104,19 +221,96 @@ document.getElementById('hint').style.display = isMobile ? 'none' : 'block';
 
 function bindBtn(id, prop) {
   const el = document.getElementById(id);
-  const on  = e => { e.preventDefault(); touch[prop]=true; };
-  const off = e => { e.preventDefault(); touch[prop]=false; };
-  el.addEventListener('touchstart', on);
-  el.addEventListener('touchend', off);
-  el.addEventListener('touchcancel', off);
+  const on  = e => { e.preventDefault(); touch[prop]=true; el.classList.add('pressed'); };
+  const off = e => { e.preventDefault(); touch[prop]=false; el.classList.remove('pressed'); };
+  el.addEventListener('touchstart', on, {passive:false});
+  el.addEventListener('touchend', off, {passive:false});
+  el.addEventListener('touchcancel', off, {passive:false});
   el.addEventListener('mousedown', on);
   el.addEventListener('mouseup', off);
   el.addEventListener('mouseleave', off);
 }
-bindBtn('btn-left','left');
-bindBtn('btn-right','right');
 bindBtn('btn-jump','jump');
 bindBtn('btn-attack','attack');
+bindBtn('btn-run','run');
+
+// ================= JOYSTICK =================
+const joyZone = document.getElementById('joystick-zone');
+const joyKnob = document.getElementById('joystick-knob');
+const joyBase = document.getElementById('joystick-base');
+let joyActive = false;
+let joyTouchId = null;
+let joyCenter = { x: 0, y: 0 };
+const JOY_RADIUS = 60; // radio máximo del desplazamiento del knob
+
+function joyStart(clientX, clientY, id){
+  joyActive = true;
+  joyTouchId = id;
+  const rect = joyZone.getBoundingClientRect();
+  joyCenter.x = rect.left + rect.width/2;
+  joyCenter.y = rect.top + rect.height/2;
+  joyMove(clientX, clientY);
+}
+function joyMove(clientX, clientY){
+  if (!joyActive) return;
+  let dx = clientX - joyCenter.x;
+  let dy = clientY - joyCenter.y;
+  const dist = Math.hypot(dx, dy);
+  if (dist > JOY_RADIUS){
+    dx = dx / dist * JOY_RADIUS;
+    dy = dy / dist * JOY_RADIUS;
+  }
+  joyKnob.style.transform = `translate(${dx}px, ${dy}px)`;
+  const nx = dx / JOY_RADIUS;
+  // Deadzone
+  if (Math.abs(nx) < 0.22) { touch.joyX = 0; }
+  else { touch.joyX = nx; }
+}
+function joyEnd(){
+  joyActive = false;
+  joyTouchId = null;
+  joyKnob.style.transform = 'translate(0px, 0px)';
+  touch.joyX = 0;
+}
+
+joyZone.addEventListener('touchstart', e => {
+  e.preventDefault();
+  if (!joyActive){
+    const t = e.changedTouches[0];
+    joyStart(t.clientX, t.clientY, t.identifier);
+  }
+}, {passive:false});
+
+joyZone.addEventListener('touchmove', e => {
+  e.preventDefault();
+  for (const t of e.changedTouches){
+    if (t.identifier === joyTouchId){ joyMove(t.clientX, t.clientY); break; }
+  }
+}, {passive:false});
+
+joyZone.addEventListener('touchend', e => {
+  e.preventDefault();
+  for (const t of e.changedTouches){
+    if (t.identifier === joyTouchId){ joyEnd(); break; }
+  }
+}, {passive:false});
+
+joyZone.addEventListener('touchcancel', e => {
+  e.preventDefault();
+  joyEnd();
+}, {passive:false});
+
+// Ratón para el joystick (útil en pruebas de escritorio)
+joyZone.addEventListener('mousedown', e => {
+  e.preventDefault();
+  joyStart(e.clientX, e.clientY, 'mouse');
+});
+window.addEventListener('mousemove', e => {
+  if (joyActive && joyTouchId === 'mouse') joyMove(e.clientX, e.clientY);
+});
+window.addEventListener('mouseup', e => {
+  if (joyActive && joyTouchId === 'mouse') joyEnd();
+});
 
 window.addEventListener('keydown', e => {
   if (e.code === 'KeyM') {
@@ -130,10 +324,17 @@ function isPressed(action){
   for (const c of codes){ if (keys[c]) return true; }
   // NUEVO: Si la acción es ataque y el control incluye Mouse0, comprobar click
   if (action === 'attack' && codes.includes('Mouse0') && mouseAttackPressed) return true;
-  if (action === 'left' && touch.left) return true;
-  if (action === 'right' && touch.right) return true;
+  if (action === 'left'){
+    if (touch.left) return true;
+    if (touch.joyX < -0.22) return true;
+  }
+  if (action === 'right'){
+    if (touch.right) return true;
+    if (touch.joyX > 0.22) return true;
+  }
   if (action === 'jump' && touch.jump) return true;
   if (action === 'attack' && touch.attack) return true;
+  if (action === 'run' && touch.run) return true;
   return false;
 }
 
@@ -1046,9 +1247,10 @@ function updatePlayer(dt){
   const right = isPressed('right');
   const jump  = isPressed('jump');
   const attack= isPressed('attack');
+  const run   = isPressed('run');
 
-  const SPEED = getMoveSpeed();
-  const ACCEL = 0.55;
+  const SPEED = getMoveSpeed() * (run ? 1.6 : 1);
+  const ACCEL = 0.55 * (run ? 1.4 : 1);
   const FRICTION = 0.82;
 
   if (left){ player.vx -= ACCEL; player.facing = -1; }
@@ -1076,7 +1278,8 @@ function updatePlayer(dt){
   
   if (!jump && player.vy < -4){ player.vy *= 0.85; }
 
-  if (keys['ShiftLeft'] || keys['ShiftRight']){
+  // Dash con Shift o botón de correr+ataque (o simplemente Shift)
+  if (keys['ShiftLeft'] || keys['ShiftRight'] || (run && attack)){
     if (player.dashCooldown <= 0){
       if (player.onGround && save.inventory.dashUnlock > 0){
         player.vx = player.facing * 12;
@@ -2924,12 +3127,12 @@ function drawControlsConfig(){
   ctx.fillStyle = grad;
   ctx.fillText('CONTROLES', W/2, 60);
   
-  const actions = ['left', 'right', 'jump', 'attack', 'pause', 'inventory'];
-  const labels = ['IZQUIERDA', 'DERECHA', 'SALTAR', 'ATACAR', 'PAUSA', 'INVENTARIO'];
+  const actions = ['left', 'right', 'jump', 'attack', 'pause', 'inventory', 'run'];
+  const labels = ['IZQUIERDA', 'DERECHA', 'SALTAR', 'ATACAR', 'PAUSA', 'INVENTARIO', 'CORRER'];
   const sel = window._controlSel || 0;
   
-  const startY = 110;
-  const rowH = 55;
+  const startY = 100;
+  const rowH = 48;
   
   for (let i = 0; i < actions.length; i++){
     const action = actions[i];
@@ -2945,10 +3148,10 @@ function drawControlsConfig(){
       ctx.strokeRect(W/2-350, ay, 700, rowH-8);
     }
     
-    ctx.font = 'bold 20px Arial Black';
+    ctx.font = 'bold 18px Arial Black';
     ctx.textAlign = 'left';
     ctx.fillStyle = '#fff';
-    ctx.fillText(labels[i], W/2-330, ay + 32);
+    ctx.fillText(labels[i], W/2-330, ay + 28);
     
     const keyCodes = controls[action];
     const keyNames = keyCodes.map(k => {
@@ -2960,6 +3163,8 @@ function drawControlsConfig(){
       if (k === 'Mouse0') return 'CLICK IZQ';
       if (k === 'Mouse1') return 'CLICK DER';
       if (k === 'Mouse2') return 'CLICK MED';
+      if (k === 'ShiftLeft') return 'SHIFT IZQ';
+      if (k === 'ShiftRight') return 'SHIFT DER';
       return k;
     }).join(' / ');
     
@@ -2968,10 +3173,10 @@ function drawControlsConfig(){
       const blink = Math.floor(t/15) % 2 === 0;
       ctx.fillStyle = blink ? '#ffd700' : '#fff';
       const hintText = action === 'attack' ? 'TECLA o CLICK...' : 'PRESIONA TECLA...';
-      ctx.fillText(hintText, W/2+330, ay + 32);
+      ctx.fillText(hintText, W/2+330, ay + 28);
     } else {
       ctx.fillStyle = '#4aff8a';
-      ctx.fillText(keyNames, W/2+330, ay + 32);
+      ctx.fillText(keyNames, W/2+330, ay + 28);
     }
     ctx.textAlign = 'left';
   }
@@ -3007,9 +3212,9 @@ function drawHowTo(){
     ['MOVER', '← → o A D'],
     ['SALTAR', 'ESPACIO / W'],
     ['ATACAR', 'J / X / CLICK IZQ'],
+    ['CORRER', 'SHIFT (mantener)'],
     ['INVENTARIO', 'I o TAB'],
     ['PAUSA', 'P o ESC'],
-    ['DASH', 'SHIFT (si desbloqueado)'],
   ];
   let y = 100;
   for (const [label, key] of lines){
@@ -3501,7 +3706,7 @@ window.addEventListener('keydown', e => {
     }
     else if (e.code === 'Escape'){ game.state = 'menu'; game.menuTime = 0; game.menuSelection = 4; }
   } else if (game.state === 'controls'){
-    const actions = ['left', 'right', 'jump', 'attack', 'pause', 'inventory'];
+    const actions = ['left', 'right', 'jump', 'attack', 'pause', 'inventory', 'run'];
     if (game.remapAction === null){
       if (e.code === 'ArrowDown' || e.code === 'KeyS'){
         window._controlSel = ((window._controlSel || 0) + 1) % actions.length;
